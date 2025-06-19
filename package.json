@@ -1,0 +1,19 @@
+{
+  "name": "day-15-project",
+  "version": "1.0.0",
+  "description": "Notes API",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "Notes API"
+  },
+  "author": "Abdulrahman Khatib",
+  "license": "ISC",
+  "dependencies": {
+    "chalk": "^5.4.1",
+    "express": "^5.1.0"
+  }
+}
