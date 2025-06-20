@@ -8,13 +8,13 @@ const mainDirname = path.dirname(__dirname);
 
 export const getDefault = (req, res) => {
   const filename = `status.json`;
-  res.status(200).sendFile(path.join(mainDirname, "/api", filename));
+  res.status(200).sendFile(path.join(mainDirname, "api", filename));
 };
 
 export const getNotes = async (req, res) => {
   const filename = `${req.params.filename}.json`;
   let notes = JSON.parse(
-    await fs.readFile(path.join(mainDirname, "/api", filename), "utf-8")
+    await fs.readFile(path.join(mainDirname, "api", filename), "utf-8")
   );
   const limit = parseInt(req.query.limit);
   if (req.query.limit) {
