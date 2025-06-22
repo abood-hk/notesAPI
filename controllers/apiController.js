@@ -66,7 +66,12 @@ export const addNote = async (req, res) => {
     title,
     content,
   };
-  if (typeof title === "string" && typeof content === "string") {
+  if (
+    typeof title === "string" &&
+    title.length > 0 &&
+    typeof content === "string" &&
+    content.length > 0
+  ) {
     notes.push(note);
   } else {
     let err = new Error(
@@ -102,7 +107,12 @@ export const updateNote = async (req, res) => {
   if (!isNaN(id) && id > 0 && id <= notes.length) {
     const index = notes.findIndex((note) => note.id === id);
     const { title, content } = req.body;
-    if (typeof title === "string" && typeof content === "string") {
+    if (
+      typeof title === "string" &&
+      title.length > 0 &&
+      typeof content === "string" &&
+      content.length > 0
+    ) {
       const note = { id, title, content };
       notes[index] = note;
       res.status(200).send(notes);
@@ -113,9 +123,10 @@ export const updateNote = async (req, res) => {
       );
       throw err;
     }
+  } else {
+    let err = new Error(
+      "The id needs to be a positive number and a note must have the id"
+    );
+    throw err;
   }
-  let err = new Error(
-    "The id needs to be a positive number and a note must have the id"
-  );
-  throw err;
 };

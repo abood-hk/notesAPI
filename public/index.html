@@ -4,6 +4,12 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Homepage</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Playwrite+ES+Deco:wght@100..400&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap"
+      rel="stylesheet"
+    />
     <link rel="stylesheet" href="/public/style/mainSty.css" />
   </head>
   <body>
@@ -12,6 +18,34 @@
       src="/public/images/yellow-note-paper-with-red-pin_1284-42430.avif"
       alt=""
     />
+    <h2>Make CRUD request</h2>
+    <form id="apiForm" action="http://localhost:5000/api/notes">
+      <div>
+        <input
+          name="title"
+          type="text"
+          id="title"
+          placeholder="Write a title"
+        />
+        <input type="text" name="ID" id="id" placeholder="Write an ID" />
+        <select name="methodSelected" id="selectMethod">
+          <option selected value="GET">GET</option>
+          <option value="POST">POST</option>
+          <option value="PUT">PUT</option>
+          <option value="DELETE">DELETE</option>
+        </select>
+      </div>
+      <div>
+        <textarea
+          placeholder="Write the content"
+          name="content"
+          id="content"
+          cols="28"
+          rows="5"
+        ></textarea>
+      </div>
+      <button id="submitBtn" type="submit">Submit</button>
+    </form>
     <script src="/public/script/mainScr.js"></script>
   </body>
 </html>
