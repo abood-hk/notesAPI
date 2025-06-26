@@ -11,19 +11,26 @@ const updateMethod = () => {
     id.disabled = false;
     title.value = "";
     content.value = "";
+    id.required = false;
   } else if (method.value === "POST") {
     id.disabled = true;
     title.disabled = false;
     content.disabled = false;
     id.value = "";
+    title.required = true;
+    content.required = true;
   } else if (method.value === "PUT") {
     title.disabled = false;
     content.disabled = false;
     id.disabled = false;
+    title.required = true;
+    content.required = true;
+    id.required = true;
   } else if (method.value === "DELETE") {
     title.disabled = true;
     content.disabled = true;
     id.disabled = false;
+    id.required = true;
     title.value = "";
     content.value = "";
   }
@@ -38,12 +45,7 @@ form.addEventListener("submit", (e) => {
     paramsObj[key] = value;
   });
   if (method.value === "GET") {
-    fetch("http://localhost:5000/api/notes/" + paramsObj["ID"], {
-      method: "GET",
-    })
-      .then((response) => response.json())
-      .then((data) => console.log(data))
-      .catch((err) => console.error(err));
+    window.location.href = `http://localhost:5000/api/notes/${paramsObj["ID"]}`;
   } else if (method.value === "POST") {
     fetch("http://localhost:5000/api/notes", {
       method: "POST",
@@ -52,9 +54,16 @@ form.addEventListener("submit", (e) => {
       },
       body: params,
     })
-      .then((response) => response.json())
-      .then((data) => console.log(data))
-      .catch((err) => console.error("err"));
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`HTTP error: ${response.status}`);
+        }
+        return response.text();
+      })
+      .then((data) => {
+        window.location.href = `http://localhost:5000/api/notes`;
+      })
+      .catch((err) => console.error("err :" + err.message));
   } else if (method.value === "PUT" && !isNaN(paramsObj["ID"])) {
     fetch("http://localhost:5000/api/notes/" + paramsObj["ID"], {
       method: "PUT",
@@ -63,13 +72,13 @@ form.addEventListener("submit", (e) => {
     })
       .then((response) => {
         if (!response.ok) {
-          let err = new Error("The response has missing info");
-          throw err;
-        } else {
-          return response.json();
+          throw new Error(`HTTP error: ${response.status}`);
         }
+        return response.text();
       })
-      .then((data) => console.log(data))
+      .then(
+        (data) => (window.location.href = `http://localhost:5000/api/notes`)
+      )
       .catch((err) => console.error(err));
   } else if (method.value === "DELETE" && !isNaN(paramsObj["ID"])) {
     fetch("http://localhost:5000/api/notes/" + paramsObj["ID"], {
@@ -77,13 +86,13 @@ form.addEventListener("submit", (e) => {
     })
       .then((response) => {
         if (!response.ok) {
-          let err = new Error("The response has missing info");
-          throw err;
-        } else {
-          return response.json();
+          throw new Error(`HTTP error: ${response.status}`);
         }
+        return response.text();
       })
-      .then((data) => console.log(data))
+      .then(
+        (data) => (window.location.href = `http://localhost:5000/api/notes`)
+      )
       .catch((err) => console.error(err));
   }
 });

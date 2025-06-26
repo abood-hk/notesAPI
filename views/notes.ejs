@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Notes</title>
+    <link rel="stylesheet" href="../../public/style/notesSty.css" />
+  </head>
+  <body>
+    <div id="notesContainer">
+      <%if(Array.isArray(notes)){ notes.forEach(note=>{%>
+      <div class="noteContainer">
+        <h2 class="title"><%=note.title%></h2>
+        <p class="content"><%=note.content%></p>
+        <p class="id"><%=note.id%></p>
+      </div>
+      <%})}else if(typeof notes==="object"&&notes !== null){%>
+      <div class="noteContainer">
+        <h2 class="title"><%=notes.title%></h2>
+        <p class="content"><%=notes.content%></p>
+        <p class="id"><%=notes.id%></p>
+      </div>
+      <%}else{%>
+      <p>Unsoppurted data Format</p>
+      <%}%>
+    </div>
+  </body>
+</html>

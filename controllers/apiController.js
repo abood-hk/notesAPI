@@ -6,24 +6,42 @@ const __filename = url.fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const mainDirname = path.dirname(__dirname);
 
+let notes = null;
+const loadNotes = async (filename) => {
+  if (!filename) {
+    notes = JSON.parse(
+      await fs.readFile(path.join(mainDirname, "api", "notes.json"), "utf-8")
+    );
+  } else if (filename === "notes.json") {
+    return;
+  } else {
+    notes = JSON.parse(
+      await fs.readFile(path.join(mainDirname, "api", filename), "utf-8")
+    );
+  }
+};
+loadNotes();
+
+setInterval(() => {
+  notes = null;
+  loadNotes();
+}, 1000);
+
 export const getDefault = (req, res) => {
   const filename = `status.json`;
   res.status(200).sendFile(path.join(mainDirname, "api", filename));
 };
 
 export const getNotes = async (req, res) => {
-  const filename = `${req.params.filename}.json`;
-  let notes = JSON.parse(
-    await fs.readFile(path.join(mainDirname, "api", filename), "utf-8")
-  );
+  loadNotes(`${req.params.filename}.json`);
   const limit = parseInt(req.query.limit);
   if (req.query.limit) {
     if (!isNaN(limit) && limit > 0) {
       if (limit > notes.length) {
-        res.status(200).json(notes);
+        return res.status(200).json(notes);
       } else {
         let filteredNotes = notes.filter((note) => note.id <= limit);
-        res.status(200).json(filteredNotes);
+        return res.status(200).json(filteredNotes);
       }
     } else {
       let err = new Error("The limit must be a positive number");
@@ -31,18 +49,15 @@ export const getNotes = async (req, res) => {
       throw err;
     }
   }
-  res.status(200).json({ count: notes.length, notes });
+  res.status(200).render("notes", { notes });
 };
 
 export const getNote = async (req, res) => {
-  const filename = `${req.params.filename}.json`;
-  let notes = JSON.parse(
-    await fs.readFile(path.join(mainDirname, "/api", filename), "utf-8")
-  );
+  loadNotes(`${req.params.filename}.json`);
   let id = parseInt(req.params.id);
   if (!isNaN(id) && id > 0 && id <= notes.length) {
     let note = notes.find((note) => note.id === id);
-    res.status(200).send(note);
+    res.status(200).render("notes", { notes: note });
   } else if (!isNaN(id) && id > 0 && id > notes.length) {
     let err = new Error("There is no note with this id");
     err.status = 400;
@@ -55,9 +70,7 @@ export const getNote = async (req, res) => {
 };
 
 export const addNote = async (req, res) => {
-  let notes = JSON.parse(
-    await fs.readFile(path.join(mainDirname, "/api", "notes.json"), "utf-8")
-  );
+  loadNotes(`${req.params.filename}.json`);
   let title = req.body.title;
   let content = req.body.content;
   let id = notes.length + 1;
@@ -80,17 +93,15 @@ export const addNote = async (req, res) => {
     err.status = 500;
     throw err;
   }
-  res.status(202).json(notes);
+  res.status(202).render("notes", { notes });
 };
 
 export const removeNote = async (req, res) => {
-  let notes = JSON.parse(
-    await fs.readFile(path.join(mainDirname, "/api", "notes.json"), "utf-8")
-  );
+  loadNotes(`${req.params.filename}.json`);
   let id = parseInt(req.params.id);
   if (!isNaN(id) && id > 0 && id <= notes.length) {
-    let filterdNotes = notes.filter((note) => note.id !== id);
-    res.status(200).json(filterdNotes);
+    notes = notes.filter((note) => note.id !== id);
+    res.status(200).render("notes", { notes });
     return;
   }
   let err = new Error(
@@ -100,9 +111,7 @@ export const removeNote = async (req, res) => {
 };
 
 export const updateNote = async (req, res) => {
-  let notes = JSON.parse(
-    await fs.readFile(path.join(mainDirname, "/api", "notes.json"), "utf-8")
-  );
+  loadNotes(`${req.params.filename}.json`);
   let id = parseInt(req.params.id);
   if (!isNaN(id) && id > 0 && id <= notes.length) {
     const index = notes.findIndex((note) => note.id === id);
@@ -115,7 +124,7 @@ export const updateNote = async (req, res) => {
     ) {
       const note = { id, title, content };
       notes[index] = note;
-      res.status(200).send(notes);
+      res.status(200).render("notes", { notes });
       return;
     } else {
       let err = new Error(
