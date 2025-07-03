@@ -4,6 +4,8 @@ const id = document.querySelector("#id");
 const content = document.querySelector("#content");
 const submitBtn = document.querySelector("#submitBtn");
 const form = document.querySelector("#apiForm");
+const errorContainer = document.querySelector("#errorsContainer");
+const whitespace = document.querySelector("#whiteSpace");
 const updateMethod = () => {
   if (method.value === "GET") {
     title.disabled = true;
@@ -45,6 +47,11 @@ form.addEventListener("submit", (e) => {
     paramsObj[key] = value;
   });
   if (method.value === "GET") {
+    if (paramsObj["ID"].includes(" ")) {
+      let err = new Error("white space");
+      whitespace.textContent = "Id Cannot have any white space";
+      throw err;
+    }
     window.location.href = `http://localhost:5000/api/notes/${paramsObj["ID"]}`;
   } else if (method.value === "POST") {
     fetch("http://localhost:5000/api/notes", {
@@ -55,13 +62,24 @@ form.addEventListener("submit", (e) => {
       body: params,
     })
       .then((response) => {
-        if (!response.ok) {
-          throw new Error(`HTTP error: ${response.status}`);
+        const contentType = response.headers.get("content-type");
+        if (contentType && contentType.includes("application/json")) {
+          return response.json();
         }
         return response.text();
       })
       .then((data) => {
-        window.location.href = `http://localhost:5000/api/notes`;
+        if (typeof data === "string") {
+          return (window.location.href = `http://localhost:5000/api/notes`);
+        }
+        errorContainer.innerHTML = "";
+        data.forEach((dt) => {
+          let h3 = document.createElement("h3");
+          h3.innerText = dt;
+          h3.classList.add("error");
+          errorContainer.appendChild(h3);
+        });
+        return;
       })
       .catch((err) => console.error("err :" + err.message));
   } else if (method.value === "PUT" && !isNaN(paramsObj["ID"])) {
@@ -71,28 +89,60 @@ form.addEventListener("submit", (e) => {
       body: params,
     })
       .then((response) => {
-        if (!response.ok) {
-          throw new Error(`HTTP error: ${response.status}`);
+        if (paramsObj["ID"].includes(" ")) {
+          let err = new Error("white space");
+          whitespace.textContent = "Id Cannot have any white space";
+          throw err;
+        }
+        const contentType = response.headers.get("content-type");
+        if (contentType && contentType.includes("application/json")) {
+          return response.json();
         }
         return response.text();
       })
-      .then(
-        (data) => (window.location.href = `http://localhost:5000/api/notes`)
-      )
+      .then((data) => {
+        if (typeof data === "string") {
+          return (window.location.href = `http://localhost:5000/api/notes`);
+        }
+        errorContainer.innerHTML = "";
+        data.forEach((dt) => {
+          let h3 = document.createElement("h3");
+          h3.innerText = dt;
+          h3.classList.add("error");
+          errorContainer.appendChild(h3);
+        });
+        return;
+      })
       .catch((err) => console.error(err));
   } else if (method.value === "DELETE" && !isNaN(paramsObj["ID"])) {
     fetch("http://localhost:5000/api/notes/" + paramsObj["ID"], {
       method: "DELETE",
     })
       .then((response) => {
-        if (!response.ok) {
-          throw new Error(`HTTP error: ${response.status}`);
+        if (paramsObj["ID"].includes(" ")) {
+          let err = new Error("white space");
+          whitespace.textContent = "Id Cannot have any white space";
+          throw err;
+        }
+        const contentType = response.headers.get("content-type");
+        if (contentType && contentType.includes("application/json")) {
+          return response.json();
         }
         return response.text();
       })
-      .then(
-        (data) => (window.location.href = `http://localhost:5000/api/notes`)
-      )
+      .then((data) => {
+        if (typeof data === "string") {
+          return (window.location.href = `http://localhost:5000/api/notes`);
+        }
+        errorContainer.innerHTML = "";
+        data.forEach((dt) => {
+          let h3 = document.createElement("h3");
+          h3.innerText = dt;
+          h3.classList.add("error");
+          errorContainer.appendChild(h3);
+        });
+        return;
+      })
       .catch((err) => console.error(err));
   }
 });

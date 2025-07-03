@@ -86,3 +86,28 @@ select:disabled {
   cursor: not-allowed;
   opacity: 0.7;
 }
+#errorContainer,
+#errorContainer .error {
+  margin-top: 10px;
+  font-family: "Roboto", sans-serif;
+}
+.error {
+  background-color: #ffe6e6;
+  color: #b30000;
+  border: 1px solid #ff4d4d;
+  border-left: 5px solid #ff1a1a;
+  padding: 10px 15px;
+  margin-bottom: 8px;
+  border-radius: 5px;
+  font-size: 0.95rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+}
+.error:empty {
+  display: none;
+}
+
+.error:hover {
+  background-color: #ffd6d6;
+  transform: scale(1.01);
+}

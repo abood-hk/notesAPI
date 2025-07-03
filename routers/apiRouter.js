@@ -7,11 +7,21 @@ import {
   removeNote,
   updateNote,
 } from "../controllers/apiController.js";
+import {
+  validateId,
+  validateTitle,
+  validateContent,
+  validateIdOp,
+} from "../meddleware/validation.js";
 const router = express.Router();
-router.get("/", getDefault);
-router.get("/:filename", getNotes);
-router.get("/:filename/:id", getNote);
-router.post("/:filename", addNote);
-router.delete("/:filename/:id", removeNote);
-router.put("/:filename/:id", updateNote);
+router.get("/", validateIdOp, getDefault);
+router.get("/:filename", validateIdOp, getNotes);
+router.get("/:filename/:id", validateId, getNote);
+router.post("/:filename", [validateContent, validateTitle], addNote);
+router.delete("/:filename/:id", validateId, removeNote);
+router.put(
+  "/:filename/:id",
+  [validateId, validateContent, validateTitle],
+  updateNote
+);
 export default router;

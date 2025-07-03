@@ -1,6 +1,7 @@
 import path from "path";
 import fs from "fs/promises";
 import url from "url";
+import { validationResult } from "express-validator";
 
 const __filename = url.fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -28,11 +29,19 @@ setInterval(() => {
 }, 1000);
 
 export const getDefault = (req, res) => {
+  let error = validationResult(req);
+  if (!error.isEmpty()) {
+    return res.status(400).json(error.array().map((err) => err.msg));
+  }
   const filename = `status.json`;
   res.status(200).sendFile(path.join(mainDirname, "api", filename));
 };
 
 export const getNotes = async (req, res) => {
+  let error = validationResult(req);
+  if (!error.isEmpty()) {
+    return res.status(400).json(error.array().map((err) => err.msg));
+  }
   loadNotes(`${req.params.filename}.json`);
   const limit = parseInt(req.query.limit);
   if (req.query.limit) {
@@ -53,6 +62,10 @@ export const getNotes = async (req, res) => {
 };
 
 export const getNote = async (req, res) => {
+  let error = validationResult(req);
+  if (!error.isEmpty()) {
+    return res.status(400).json(error.array().map((err) => err.msg));
+  }
   loadNotes(`${req.params.filename}.json`);
   let id = parseInt(req.params.id);
   if (!isNaN(id) && id > 0 && id <= notes.length) {
@@ -70,6 +83,10 @@ export const getNote = async (req, res) => {
 };
 
 export const addNote = async (req, res) => {
+  let error = validationResult(req);
+  if (!error.isEmpty()) {
+    return res.status(400).json(error.array().map((err) => err.msg));
+  }
   loadNotes(`${req.params.filename}.json`);
   let title = req.body.title;
   let content = req.body.content;
@@ -97,6 +114,10 @@ export const addNote = async (req, res) => {
 };
 
 export const removeNote = async (req, res) => {
+  let error = validationResult(req);
+  if (!error.isEmpty()) {
+    return res.status(400).json(error.array().map((err) => err.msg));
+  }
   loadNotes(`${req.params.filename}.json`);
   let id = parseInt(req.params.id);
   if (!isNaN(id) && id > 0 && id <= notes.length) {
@@ -111,6 +132,10 @@ export const removeNote = async (req, res) => {
 };
 
 export const updateNote = async (req, res) => {
+  let error = validationResult(req);
+  if (!error.isEmpty()) {
+    return res.status(400).json(error.array().map((err) => err.msg));
+  }
   loadNotes(`${req.params.filename}.json`);
   let id = parseInt(req.params.id);
   if (!isNaN(id) && id > 0 && id <= notes.length) {
