@@ -13,14 +13,13 @@
     <link rel="stylesheet" href="/public/style/mainSty.css" />
   </head>
   <body>
-    <h1>Welcome to the notes api</h1>
+    <h1>Welcome to the notes API</h1>
     <img
       src="/public/images/yellow-note-paper-with-red-pin_1284-42430.avif"
       alt=""
     />
-    <h2>Make CRUD request</h2>
+    <h2>Make a CRUD request</h2>
     <form id="apiForm" action="http://localhost:5000/api/notes">
-      <h3 id="whiteSpace"></h3>
       <div id="errorsContainer"></div>
       <div>
         <input
@@ -30,6 +29,12 @@
           placeholder="Write a title"
         />
         <input type="text" name="ID" id="id" placeholder="Write an ID" />
+        <input
+          type="text"
+          name="limit"
+          id="limit"
+          placeholder="How many notes"
+        />
         <select name="methodSelected" id="selectMethod">
           <option selected value="GET">GET</option>
           <option value="POST">POST</option>

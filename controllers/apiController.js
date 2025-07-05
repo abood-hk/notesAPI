@@ -2,39 +2,27 @@ import path from "path";
 import fs from "fs/promises";
 import url from "url";
 import { validationResult } from "express-validator";
+import Note from "../dataBase/models/notes.js";
+import mongoose from "mongoose";
 
 const __filename = url.fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const mainDirname = path.dirname(__dirname);
 
-let notes = null;
-const loadNotes = async (filename) => {
-  if (!filename) {
-    notes = JSON.parse(
-      await fs.readFile(path.join(mainDirname, "api", "notes.json"), "utf-8")
-    );
-  } else if (filename === "notes.json") {
-    return;
-  } else {
-    notes = JSON.parse(
-      await fs.readFile(path.join(mainDirname, "api", filename), "utf-8")
-    );
-  }
-};
-loadNotes();
-
-setInterval(() => {
-  notes = null;
-  loadNotes();
-}, 1000);
-
-export const getDefault = (req, res) => {
+export const getDefault = async (req, res) => {
   let error = validationResult(req);
   if (!error.isEmpty()) {
     return res.status(400).json(error.array().map((err) => err.msg));
   }
-  const filename = `status.json`;
-  res.status(200).sendFile(path.join(mainDirname, "api", filename));
+  const note = await Note.find();
+  res.status(200).render("notes", { notes: note });
+};
+
+export const getStatus = async (req, res) => {
+  const status = JSON.parse(
+    await fs.readFile(path.join(mainDirname, "api", "status.json"), "utf-8")
+  );
+  res.status(200).json(status);
 };
 
 export const getNotes = async (req, res) => {
@@ -42,23 +30,19 @@ export const getNotes = async (req, res) => {
   if (!error.isEmpty()) {
     return res.status(400).json(error.array().map((err) => err.msg));
   }
-  loadNotes(`${req.params.filename}.json`);
+  const note = await Note.find();
   const limit = parseInt(req.query.limit);
   if (req.query.limit) {
     if (!isNaN(limit) && limit > 0) {
-      if (limit > notes.length) {
-        return res.status(200).json(notes);
-      } else {
-        let filteredNotes = notes.filter((note) => note.id <= limit);
-        return res.status(200).json(filteredNotes);
-      }
+      const limitedNotes = await Note.find().limit(limit);
+      return res.status(200).render("notes", { notes: limitedNotes });
     } else {
       let err = new Error("The limit must be a positive number");
       err.status = 400;
       throw err;
     }
   }
-  res.status(200).render("notes", { notes });
+  res.status(200).render("notes", { notes: note });
 };
 
 export const getNote = async (req, res) => {
@@ -66,17 +50,18 @@ export const getNote = async (req, res) => {
   if (!error.isEmpty()) {
     return res.status(400).json(error.array().map((err) => err.msg));
   }
-  loadNotes(`${req.params.filename}.json`);
-  let id = parseInt(req.params.id);
-  if (!isNaN(id) && id > 0 && id <= notes.length) {
-    let note = notes.find((note) => note.id === id);
-    res.status(200).render("notes", { notes: note });
-  } else if (!isNaN(id) && id > 0 && id > notes.length) {
-    let err = new Error("There is no note with this id");
-    err.status = 400;
-    throw err;
+  let id = req.params.id;
+  if (typeof id === "string" && id.length === 24) {
+    id = new mongoose.Types.ObjectId(id);
+    const requestedNote = await Note.findById(id);
+    if (!requestedNote) {
+      let err = new Error("an element must have the id");
+      err.status = 400;
+      throw err;
+    }
+    res.status(200).render("notes", { notes: requestedNote });
   } else {
-    let err = new Error("The id must be a positive number");
+    let err = new Error("an element must have the id");
     err.status = 400;
     throw err;
   }
@@ -87,12 +72,9 @@ export const addNote = async (req, res) => {
   if (!error.isEmpty()) {
     return res.status(400).json(error.array().map((err) => err.msg));
   }
-  loadNotes(`${req.params.filename}.json`);
   let title = req.body.title;
   let content = req.body.content;
-  let id = notes.length + 1;
   let note = {
-    id,
     title,
     content,
   };
@@ -102,7 +84,7 @@ export const addNote = async (req, res) => {
     typeof content === "string" &&
     content.length > 0
   ) {
-    notes.push(note);
+    await Note.create(note);
   } else {
     let err = new Error(
       "You have to include both content and a title (both as strings)"
@@ -110,7 +92,7 @@ export const addNote = async (req, res) => {
     err.status = 500;
     throw err;
   }
-  res.status(202).render("notes", { notes });
+  res.status(201).render("notes", { notes: await Note.find() });
 };
 
 export const removeNote = async (req, res) => {
@@ -118,16 +100,19 @@ export const removeNote = async (req, res) => {
   if (!error.isEmpty()) {
     return res.status(400).json(error.array().map((err) => err.msg));
   }
-  loadNotes(`${req.params.filename}.json`);
-  let id = parseInt(req.params.id);
-  if (!isNaN(id) && id > 0 && id <= notes.length) {
-    notes = notes.filter((note) => note.id !== id);
-    res.status(200).render("notes", { notes });
+  let id = req.params.id;
+  if (typeof id === "string" && id.length === 24) {
+    id = new mongoose.Types.ObjectId(id);
+    const exist = await Note.exists({ _id: id });
+    if (!exist) {
+      let err = new Error("an element must have the id");
+      throw err;
+    }
+    await Note.deleteOne({ _id: id });
+    res.status(200).render("notes", { notes: await Note.find() });
     return;
   }
-  let err = new Error(
-    "The id needs to be a positive number and a note must have the id"
-  );
+  let err = new Error("an element must have the id");
   throw err;
 };
 
@@ -136,10 +121,10 @@ export const updateNote = async (req, res) => {
   if (!error.isEmpty()) {
     return res.status(400).json(error.array().map((err) => err.msg));
   }
-  loadNotes(`${req.params.filename}.json`);
-  let id = parseInt(req.params.id);
-  if (!isNaN(id) && id > 0 && id <= notes.length) {
-    const index = notes.findIndex((note) => note.id === id);
+
+  let id = req.params.id;
+  if (typeof id === "string" && id.length === 24) {
+    id = new mongoose.Types.ObjectId(id);
     const { title, content } = req.body;
     if (
       typeof title === "string" &&
@@ -147,9 +132,16 @@ export const updateNote = async (req, res) => {
       typeof content === "string" &&
       content.length > 0
     ) {
-      const note = { id, title, content };
-      notes[index] = note;
-      res.status(200).render("notes", { notes });
+      const exist = await Note.exists({ _id: id });
+      if (!exist) {
+        throw new Error("no note with this id");
+      }
+      await Note.updateOne(
+        { _id: id },
+        { title: title, content: content },
+        { runValidators: true }
+      );
+      res.status(200).render("notes", { notes: await Note.find() });
       return;
     } else {
       let err = new Error(

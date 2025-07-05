@@ -10,12 +10,22 @@
     <div id="notesContainer">
       <%if(Array.isArray(notes)){ notes.forEach(note=>{%>
       <div class="noteContainer">
+        <div class="overlay"></div>
+        <h3 class="createdAt">
+          Created at: <%=note.shortCreatedTime%> <br />
+          Last updated at: <%=note.shortUpdatedTime%>
+        </h3>
         <h2 class="title"><%=note.title%></h2>
         <p class="content"><%=note.content%></p>
         <p class="id"><%=note.id%></p>
       </div>
       <%})}else if(typeof notes==="object"&&notes !== null){%>
       <div class="noteContainer">
+        <div class="overlay"></div>
+        <h3 class="createdAt">
+          Created at: <%=notes.shortCreatedTime%><br />
+          Last Updated at: <%=notes.shortUpdatedTime%>
+        </h3>
         <h2 class="title"><%=notes.title%></h2>
         <p class="content"><%=notes.content%></p>
         <p class="id"><%=notes.id%></p>
@@ -24,5 +34,7 @@
       <p>Unsoppurted data Format</p>
       <%}%>
     </div>
+    <a href="../../public/index" id="back">Go Back</a>
+    <script src="../../public/script/notesScr.js"></script>
   </body>
 </html>

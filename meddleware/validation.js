@@ -17,16 +17,19 @@ export const validateId = param("id")
   .trim()
   .notEmpty()
   .escape()
-  .isInt({ min: 1, max: 4 })
-  .withMessage(
-    "The id must be a positive integer and a note should have the id"
-  );
+  .isString({ min: 24, max: 24 })
+  .withMessage("No item with this id");
 export const validateIdOp = param("id")
   .trim()
   .notEmpty()
   .escape()
-  .isInt({ min: 1, max: 4 })
+  .isString({ min: 24, max: 24 })
   .optional()
-  .withMessage(
-    "The id must be a positive integer and a note should have the id"
-  );
+  .withMessage("No item with this id");
+export const validateLimit = param("limit")
+  .trim()
+  .notEmpty()
+  .escape()
+  .isInt({ min: 1 })
+  .optional()
+  .withMessage("limit must be a positive integer");

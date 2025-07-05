@@ -6,21 +6,24 @@ import {
   addNote,
   removeNote,
   updateNote,
+  getStatus,
 } from "../controllers/apiController.js";
 import {
   validateId,
   validateTitle,
   validateContent,
   validateIdOp,
+  validateLimit,
 } from "../meddleware/validation.js";
 const router = express.Router();
+router.get("/status", getStatus);
 router.get("/", validateIdOp, getDefault);
-router.get("/:filename", validateIdOp, getNotes);
-router.get("/:filename/:id", validateId, getNote);
-router.post("/:filename", [validateContent, validateTitle], addNote);
-router.delete("/:filename/:id", validateId, removeNote);
+router.get("/notes", [validateIdOp, validateLimit], getNotes);
+router.get("/notes/:id", [validateId, validateLimit], getNote);
+router.post("/notes", [validateContent, validateTitle], addNote);
+router.delete("/notes/:id", validateId, removeNote);
 router.put(
-  "/:filename/:id",
+  "/notes/:id",
   [validateId, validateContent, validateTitle],
   updateNote
 );

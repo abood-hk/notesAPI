@@ -19,6 +19,7 @@ body {
   justify-content: center;
   gap: 2rem;
   margin-top: 2rem;
+  margin-bottom: 1.5rem;
 }
 
 /* Note Style */
@@ -62,11 +63,42 @@ body {
   margin-bottom: 0.5rem;
   color: #333;
 }
-
 .noteContainer .id {
   font-size: 0.8rem;
   color: #777;
   position: absolute;
   bottom: 10px;
   right: 10px;
+  z-index: 2;
+}
+.overlay {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: rgba(0, 0, 0, 0.711);
+  z-index: 1;
+  clip-path: inset(0 100% 0 0);
+  transition: clip-path 0.5s ease;
+  border-radius: 8px;
+}
+.createdAt {
+  position: absolute;
+  z-index: 2;
+  color: whitesmoke;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.visible {
+  opacity: 1;
+  clip-path: inset(0 0% 0 0);
+}
+#back {
+  color: black;
+  font-weight: 600;
+}
+.brighterColor {
+  color: whitesmoke !important;
+  font-weight: 500;
 }
