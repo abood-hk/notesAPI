@@ -80,7 +80,7 @@ form.addEventListener("submit", (e) => {
   }
   if (method.value === "GET") {
     fetch(
-      `http://localhost:5000/api/notes/${paramsObj["ID"]}?${params.substring(
+      `../../api/notes/${paramsObj["ID"]}?${params.substring(
         indexStart,
         indexEnd
       )}`,
@@ -97,8 +97,7 @@ form.addEventListener("submit", (e) => {
       })
       .then((data) => {
         if (typeof data === "string") {
-          console.log("gh");
-          return (window.location.href = `http://localhost:5000/api/notes/${
+          return (window.location.href = `../../api/notes${
             paramsObj["ID"]
           }?${params.substring(indexStart, indexEnd)}`);
         }
@@ -113,7 +112,7 @@ form.addEventListener("submit", (e) => {
         console.log(err.message);
       });
   } else if (method.value === "POST") {
-    fetch("http://localhost:5000/api/notes", {
+    fetch("../../api/notes/", {
       method: "POST",
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
@@ -129,7 +128,7 @@ form.addEventListener("submit", (e) => {
       })
       .then((data) => {
         if (typeof data === "string") {
-          return (window.location.href = `http://localhost:5000/api/notes`);
+          return (window.location.href = `../../api/notes/`);
         }
         errorContainer.innerHTML = "";
         data.forEach((dt) => {
@@ -142,7 +141,7 @@ form.addEventListener("submit", (e) => {
       })
       .catch((err) => console.error("err :" + err.message));
   } else if (method.value === "PUT") {
-    fetch("http://localhost:5000/api/notes/" + paramsObj["ID"], {
+    fetch("../../api/notes/" + paramsObj["ID"], {
       method: "PUT",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
       body: params,
@@ -156,7 +155,7 @@ form.addEventListener("submit", (e) => {
       })
       .then((data) => {
         if (typeof data === "string") {
-          return (window.location.href = `http://localhost:5000/api/notes`);
+          return (window.location.href = `../../api/notes/`);
         }
         errorContainer.innerHTML = "";
         data.forEach((dt) => {
@@ -176,7 +175,7 @@ form.addEventListener("submit", (e) => {
         console.error(err);
       });
   } else if (method.value === "DELETE") {
-    fetch("http://localhost:5000/api/notes/" + paramsObj["ID"], {
+    fetch("../../api/notes/" + paramsObj["ID"], {
       method: "DELETE",
     })
       .then((response) => {
@@ -188,7 +187,7 @@ form.addEventListener("submit", (e) => {
       })
       .then((data) => {
         if (typeof data === "string") {
-          return (window.location.href = `http://localhost:5000/api/notes`);
+          return (window.location.href = `../../api/notes/`);
         }
         errorContainer.innerHTML = "";
         data.forEach((dt) => {
