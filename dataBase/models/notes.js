@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import users from "./users.js";
 const notesSchema = new mongoose.Schema({
   title: {
     type: String,
@@ -13,6 +14,12 @@ const notesSchema = new mongoose.Schema({
     minlength: 1,
     maxlength: 250,
     trim: true,
+  },
+  user: {
+    type: mongoose.Types.ObjectId,
+    ref: "users",
+    required: "true",
+    default: "686ac72aba2402d4d8867e60",
   },
   createdAt: {
     type: Date,
@@ -31,6 +38,13 @@ const notesSchema = new mongoose.Schema({
 //     });
 //     console.log(`${doc.title} was created at (locally): ${localTime}`);
 //   });
+// });
+//
+// notesSchema.post("find", async function (docs) {
+//   for (const doc of docs) {
+//     await doc.populate("user");
+//     console.log(doc);
+//   }
 // });
 notesSchema.pre(["updateMany", "updateOne"], function (next) {
   this.set({ updatedAt: Date.now() });

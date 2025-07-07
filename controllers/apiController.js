@@ -59,6 +59,17 @@ export const getNote = async (req, res) => {
       err.status = 400;
       throw err;
     }
+    const limit = parseInt(req.query.limit);
+    if (req.query.limit) {
+      if (!isNaN(limit) && limit > 0) {
+        const limitedNotes = await Note.findById(id).limit(limit);
+        return res.status(200).render("notes", { notes: limitedNotes });
+      } else {
+        let err = new Error("The limit must be a positive number");
+        err.status = 400;
+        throw err;
+      }
+    }
     res.status(200).render("notes", { notes: requestedNote });
   } else {
     let err = new Error("an element must have the id");

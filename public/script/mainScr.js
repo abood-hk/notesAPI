@@ -79,9 +79,39 @@ form.addEventListener("submit", (e) => {
     }
   }
   if (method.value === "GET") {
-    window.location.href = `http://localhost:5000/api/notes/${
-      paramsObj["ID"]
-    }?${params.substring(indexStart, indexEnd)}`;
+    fetch(
+      `http://localhost:5000/api/notes/${paramsObj["ID"]}?${params.substring(
+        indexStart,
+        indexEnd
+      )}`,
+      {
+        method: "GET",
+      }
+    )
+      .then((response) => {
+        const contentType = response.headers.get("content-type");
+        if (contentType && contentType.includes("application/json")) {
+          return response.json();
+        }
+        return response.text();
+      })
+      .then((data) => {
+        if (typeof data === "string") {
+          console.log("gh");
+          return (window.location.href = `http://localhost:5000/api/notes/${
+            paramsObj["ID"]
+          }?${params.substring(indexStart, indexEnd)}`);
+        }
+        errorContainer.innerHTML = "";
+        let h3 = document.createElement("h3");
+        h3.innerText = data["error"];
+        h3.classList.add("error");
+        errorContainer.appendChild(h3);
+        return;
+      })
+      .catch((err) => {
+        console.log(err.message);
+      });
   } else if (method.value === "POST") {
     fetch("http://localhost:5000/api/notes", {
       method: "POST",

@@ -6,6 +6,7 @@ import mainRouter from "./routers/mainRouter.js";
 import path from "path";
 import url from "url";
 import helmet from "helmet";
+import cors from "cors";
 import "./dataBase/connect.js";
 
 const __filename = url.fileURLToPath(import.meta.url);
@@ -19,6 +20,7 @@ app.use(logger);
 app.use(helmet());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use(cors());
 app.use("/api", apiRouter);
 app.use("/public", mainRouter);
 app.get("/", (req, res) => {
