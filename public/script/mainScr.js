@@ -97,7 +97,7 @@ form.addEventListener("submit", (e) => {
       })
       .then((data) => {
         if (typeof data === "string") {
-          return (window.location.href = `../../api/notes${
+          return (window.location.href = `../../api/notes/${
             paramsObj["ID"]
           }?${params.substring(indexStart, indexEnd)}`);
         }
